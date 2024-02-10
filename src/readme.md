@@ -14,6 +14,6 @@
 	* The file format is `x,y`.
     * For example, if you want to test on CaStreet, set `dataset_id = 0`  in `parameter` directory.
     * IMIS and NYC cannot be uploaded (due to size limitation).
-* Compile: `g++ -o xxx.out-O3 main.cpp`.
+* Compile: `g++ -o xxx.out -O3 main.cpp`.
 * Run: `./xxx.out`
 
