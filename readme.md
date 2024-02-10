@@ -13,7 +13,7 @@
 	* In `input_data()` of `utils.hpp`, you can freely write codes for reading your dataset.
 	* The file format is `x,y`.
     * For example, if you want to test on CaStreet, set `dataset_id = 0`  in `parameter` directory.
-    * IMIS and NYC cannot be uploaded (due to size limitation).
+    * Foursquare, IMIS, and NYC cannot be uploaded (due to size limitation), whereas CaStreet.zip needs unzip.
 * Compile: `g++ -o xxx.out-O3 main.cpp`.
 * Run: `./xxx.out`
 
