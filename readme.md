@@ -1,6 +1,8 @@
 ## Introduction
 * This repository provides implementations of the algorithms introduced in `Random Sampling over Spatial Range Joins`.
 
+[![MIT licensed](https://img.shields.io/badge/license-MIT-yellow.svg)](https://github.com/amgt-d1/IRS-interval/blob/main/license.txt)
+
 ## Requirement
 * Linux OS (Ubuntu).
    * The others have not been tested.
