@@ -21,10 +21,10 @@
 If you use our implementation, please cite the following paper.
 ``` 
 @inproceedings{amagata2024independent,  
-    title={Independent Range Sampling on Interval Data},  
+    title={Random Sampling over Spatial Range Joins},  
     author={Amagata, Daichi},  
     booktitle={ICDE},  
-    pages={449-461},  
-    year={2024}  
+    pages={xxx-xxx},  
+    year={2025}  
 }
 ``` 
