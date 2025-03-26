@@ -17,3 +17,14 @@
 * Compile: `g++ -o xxx.out -O3 main.cpp`.
 * Run: `./xxx.out`
 
+## Citation
+If you use our implementation, please cite the following paper.
+``` 
+@inproceedings{amagata2024independent,  
+    title={Independent Range Sampling on Interval Data},  
+    author={Amagata, Daichi},  
+    booktitle={ICDE},  
+    pages={449-461},  
+    year={2024}  
+}
+``` 
