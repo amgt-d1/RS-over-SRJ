@@ -17,6 +17,7 @@
     * For example, if you want to test on CaStreet, set `dataset_id = 0`  in `parameter` directory.
     * Foursquare, IMIS, and NYC cannot be uploaded (due to size limitation), whereas CaStreet.zip needs unzip.
 * Compile: `g++ -o xxx.out -O3 main.cpp`.
+  	* This is required for each algorithm directory.
 * Run: `./xxx.out`
 
 ## Citation
