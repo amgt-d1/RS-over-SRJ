@@ -27,7 +27,7 @@ If you use our implementation, please cite the following paper.
     title={Random Sampling over Spatial Range Joins},  
     author={Amagata, Daichi},  
     booktitle={ICDE},  
-    pages={xxx-xxx},  
+    pages={2080-2093},  
     year={2025}  
 }
 ``` 
