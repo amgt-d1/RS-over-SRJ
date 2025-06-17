@@ -23,7 +23,7 @@
 ## Citation
 If you use our implementation, please cite the following paper.
 ``` 
-@inproceedings{amagata2024independent,  
+@inproceedings{amagata2025random,  
     title={Random Sampling over Spatial Range Joins},  
     author={Amagata, Daichi},  
     booktitle={ICDE},  
