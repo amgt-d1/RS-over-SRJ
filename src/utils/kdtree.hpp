@@ -38,235 +38,111 @@ struct Node
 bool compare_x(const point &a, const point &b){ return  a.x < b.x; }
 bool compare_y(const point &a, const point &b){ return  a.y < b.y; }
 
-// int min(const float a, const float b)
-// {
-//     if (a > b) return b;
-//     return a;
-// }
-
-// int max(const float a, const float b)
-// {
-//     if (a < b) return b;
-//     return a;
-// }
-
-// get median
-void find_median(point *pointlist, unsigned int size, bool x)
+static void find_median(point *pts, unsigned int size, bool use_x)
 {
-    if (size % 2 == 0) --size;
-    if (x)
+    if (size == 0) return;
+    unsigned int n = size;
+    unsigned int m = n / 2;  // 0-based median
+    if (use_x)
     {
-        std::nth_element(pointlist, pointlist + size / 2, pointlist + (size - 1), compare_x); 
-        // return pointlist[size / 2].x;
+        std::nth_element(pts, pts + m, pts + n, compare_x);
     }
     else
     {
-        std::nth_element(pointlist, pointlist + size / 2, pointlist + (size - 1), compare_y);    
-        // return pointlist[size / 2].y;
+        std::nth_element(pts, pts + m, pts + n, compare_y);
     }
-} 
-
-// build a kd-tree
-Node *kdtree(point *pointlist, int right, int depth, const unsigned int left_idx, const unsigned int right_idx)
-{
-    if (right < 0)
-    {
-        return NULL;
-    }
-    
-    if (right == 0)
-    {        
-        Node *new_node = (Node*)malloc(sizeof(Node));        
-        new_node->location = pointlist[right];        
-        new_node->leftChild = NULL;
-        new_node->rightChild = NULL;
-        new_node->subtree_size = right + 1;
-        new_node->leftmost = new_node->location.x;
-        new_node->rightmost = new_node->location.x;
-        new_node->upmost = new_node->location.y;
-        new_node->downmost = new_node->location.y;
-
-        new_node->left_idx = left_idx;
-        new_node->right_idx = left_idx;
-        
-        return new_node;        
-    }
-    
-        // determine divide dimension (x or y)
-    int axis = depth % 2;
-    
-    // make a new node
-    Node *new_node = (Node*)malloc(sizeof(Node));
-
-    // set left & right indices
-    new_node->left_idx = left_idx;
-    new_node->right_idx = right_idx;
-
-    // set coordinate of the space
-    new_node->leftmost = pointlist[0].x;
-    new_node->rightmost = pointlist[0].x;
-    new_node->downmost = pointlist[0].y;
-    new_node->upmost = pointlist[0].y;
-    for (unsigned int i = 1; i < right + 1; ++i)
-    {
-        if (new_node->leftmost > pointlist[i].x) new_node->leftmost = pointlist[i].x;
-        if (new_node->rightmost < pointlist[i].x) new_node->rightmost = pointlist[i].x;
-        if (new_node->downmost > pointlist[i].y) new_node->downmost = pointlist[i].y;
-        if (new_node->upmost < pointlist[i].y) new_node->upmost = pointlist[i].y;
-    }
-
-    // get median
-    if (axis == 0)
-    {
-        find_median(pointlist, right + 1, 1);
-    }
-    else if (axis == 1)
-    {
-        find_median(pointlist, right + 1, 0);
-    }    
-    int median = right / 2;
-    unsigned int median_idx = (left_idx + right_idx + 1) / 2;    
-    new_node->location = pointlist[median];
-    new_node->subtree_size = right + 1;
-
-    // make child nodes
-    new_node->rightChild = kdtree(pointlist + median + 1, right - (median + 1), depth + 1, median_idx + 1, right_idx);
-    new_node->leftChild = kdtree(pointlist, median - 1, depth + 1, left_idx, median_idx - 1);
-    
-    // if (axis == 0)
-    // {        
-    //     if (new_node->rightChild != NULL && new_node->leftChild != NULL)
-    //     {
-    //         new_node->upmost = max(new_node->rightChild->upmost, new_node->leftChild->upmost);
-    //         new_node->downmost = min(new_node->rightChild->downmost, new_node->leftChild->downmost);            
-    //     }
-    //     else if (new_node->rightChild != NULL)
-    //     {
-    //         new_node->upmost = new_node->rightChild->upmost;
-    //         new_node->downmost = new_node->rightChild->downmost;            
-    //     }
-    //     else if (new_node->leftChild != NULL)
-    //     {
-    //         new_node->upmost = new_node->leftChild->upmost;
-    //         new_node->downmost = new_node->leftChild->downmost;
-    //     }
-    //     else
-    //     {
-    //         new_node->upmost = new_node->location.y;
-    //         new_node->downmost = new_node->location.y;
-    //     }        
-    // }
-    // else
-    // {        
-    //     if (new_node->rightChild != NULL && new_node->leftChild != NULL)
-    //     {
-    //         new_node->rightmost = max(new_node->rightChild->rightmost,new_node->leftChild->rightmost);
-    //         new_node->leftmost = min(new_node->rightChild->leftmost,new_node->leftChild->leftmost);            
-    //     }
-    //     else if (new_node->rightChild != NULL)
-    //     {
-    //         new_node->rightmost = new_node->rightChild->rightmost;
-    //         new_node->leftmost = new_node->rightChild->leftmost;            
-    //     }
-    //     else if (new_node->leftChild != NULL)
-    //     {
-    //         new_node->rightmost = new_node->leftChild->rightmost;
-    //         new_node->leftmost = new_node->leftChild->leftmost;
-    //     }
-    //     else
-    //     {
-    //         new_node->rightmost = new_node->location.x;
-    //         new_node->leftmost = new_node->location.x;
-    //     }        
-    // }
-    
-    return new_node;
 }
 
-// kd-tree-based partitioning
-void partition(point *pointlist, int right, int depth, const unsigned int left_idx, const unsigned int right_idx)
+Node *kdtree(point *pointlist, int right, int depth, unsigned int left_idx, unsigned int right_idx)
 {
-    if (right <= 0)
+    if (right < 0)  return NULL;
+
+    unsigned int n = (unsigned int)right + 1;
+    unsigned int span = right_idx - left_idx + 1;
+
+    if (n != span)
     {
-        return;
+        // debugging
+        // fprintf(stderr, "kdtree: n != span (%u vs %u)\n", n, span);
+        // exit(1);
     }
-    
-    // determine divide dimension (x or y)
+
+    // leaf node
+    if (n == 1)
+    {
+        Node *node = (Node*)malloc(sizeof(Node));
+        node->location = pointlist[0];
+        node->leftChild = NULL;
+        node->rightChild= NULL;
+
+        node->left_idx = left_idx;
+        node->right_idx = right_idx;
+        node->subtree_size = 1;
+
+        node->leftmost = pointlist[0].x;
+        node->rightmost = pointlist[0].x;
+        node->downmost = pointlist[0].y;
+        node->upmost = pointlist[0].y;
+
+        return node;
+    }
+
+    // intermediate node
     int axis = depth % 2;
 
-    // get median
-    if (axis == 0)
+    // MBR
+    float lx = pointlist[0].x, rx = pointlist[0].x;
+    float dy = pointlist[0].y, uy = pointlist[0].y;
+    for (unsigned int i = 1; i < n; ++i)
     {
-        find_median(pointlist, right + 1, 1);
+        if (lx > pointlist[i].x) lx = pointlist[i].x;
+        if (rx < pointlist[i].x) rx = pointlist[i].x;
+        if (dy > pointlist[i].y) dy = pointlist[i].y;
+        if (uy < pointlist[i].y) uy = pointlist[i].y;
     }
-    else if (axis == 1)
+
+    find_median(pointlist, n, axis == 0);
+    unsigned int m = n / 2; 
+    unsigned int mid_idx = left_idx + m;
+
+    Node *node = (Node*)malloc(sizeof(Node));
+    node->location  = pointlist[m];
+    node->left_idx  = left_idx;
+    node->right_idx = right_idx;
+    node->subtree_size = span;
+
+    node->leftmost  = lx;
+    node->rightmost = rx;
+    node->downmost  = dy;
+    node->upmost    = uy;
+
+    // left child
+    unsigned int left_span = m;
+    if (left_span > 0)
     {
-        find_median(pointlist, right + 1, 0);
-    }    
-    int median = right / 2;
-    unsigned int median_idx = (left_idx + right_idx + 1) / 2;    
-
-    // make child nodes
-    partition(pointlist + median + 1, right - (median + 1), depth + 1, median_idx + 1, right_idx);
-    partition(pointlist, median - 1, depth + 1, left_idx, median_idx - 1);
-}
-
-// build a binary tree
-Node *binary_tree(point *pointlist, int right, const unsigned int left_idx, const unsigned int right_idx)
-{
-    if (right < 0)
+        node->leftChild = kdtree(pointlist, (int)m - 1, depth + 1, left_idx, mid_idx - 1);
+    }
+    else
     {
-        return NULL;
+        node->leftChild = NULL;
     }
-    
-    if (right == 0)
-    {        
-        Node *new_node = (Node*)malloc(sizeof(Node));        
-        new_node->location = pointlist[right];        
-        new_node->leftChild = NULL;
-        new_node->rightChild = NULL;
-        new_node->subtree_size = right + 1;
-        new_node->leftmost = new_node->location.x;
-        new_node->rightmost = new_node->location.x;
-        new_node->upmost = new_node->location.y;
-        new_node->downmost = new_node->location.y;
 
-        new_node->left_idx = left_idx;
-        new_node->right_idx = left_idx;
-        
-        return new_node;        
-    }
-    
-    Node *new_node = (Node*)malloc(sizeof(Node));
-    new_node->left_idx = left_idx;
-    new_node->right_idx = right_idx;
-
-    new_node->leftmost = pointlist[0].x;
-    new_node->rightmost = pointlist[0].x;
-    new_node->downmost = pointlist[0].y;
-    new_node->upmost = pointlist[0].y;
-    for (unsigned int i = 1; i < right + 1; ++i)
+    // right child
+    unsigned int right_span = n - m - 1;
+    if (right_span > 0)
     {
-        if (new_node->leftmost > pointlist[i].x) new_node->leftmost = pointlist[i].x;
-        if (new_node->rightmost < pointlist[i].x) new_node->rightmost = pointlist[i].x;
-        if (new_node->downmost > pointlist[i].y) new_node->downmost = pointlist[i].y;
-        if (new_node->upmost < pointlist[i].y) new_node->upmost = pointlist[i].y;
+        node->rightChild = kdtree(pointlist + m + 1, (int)right_span - 1, depth + 1, mid_idx + 1, right_idx);
     }
-    
-    int median = right / 2;
-    unsigned int median_idx = (left_idx + right_idx + 1) / 2;
-    
-    new_node->location = pointlist[median];
-    new_node->subtree_size = right + 1;
+    else
+    {
+        node->rightChild = NULL;
+    }
 
-    new_node->rightChild = binary_tree(pointlist + median + 1, right - (median + 1), median_idx + 1, right_idx);
-    new_node->leftChild = binary_tree(pointlist, median - 1, left_idx, median_idx - 1);
-    
-    return new_node;
+    return node;
 }
 
 // check fully covered
-int is_contained(Node *region, const float sx, const float tx, const float sy, const float ty)
+int is_contained(const Node *region, const float sx, const float tx, const float sy, const float ty)
 {    
     if (region->leftmost < sx || region->rightmost > tx || region->upmost > ty || region->downmost < sy) return 0;    
     return 1;
@@ -313,9 +189,32 @@ void SearchKDtree(Node *v, std::vector<std::pair<Node*, bool>> &result, const fl
     return;
 }
 
-// range counting
-void CountKDtree(Node *v, unsigned int &count, const float sx, const float tx, const float sy, const float ty)
+// orthogonal range search
+void range_search(Node *v, std::vector<unsigned int> &result, const float sx, const float tx, const float sy, const float ty)
 {
+    // disjoint case    
+    if (v->rightmost < sx || v->leftmost > tx || v->downmost > ty || v->upmost < sy) return;
+    
+    // leaf node case
+    if (v->leftChild == NULL && v->rightChild == NULL)
+    {
+        result.push_back(v->location.idx);
+        return;
+    }
+    
+    // intermediate node case
+    if (sx <= v->location.x && v->location.x <= tx && sy <= v->location.y && v->location.y <= ty) result.push_back(v->location.idx);
+    if (v->leftChild != NULL) range_search(v->leftChild, result, sx, tx, sy, ty);    
+    if (v->rightChild != NULL) range_search(v->rightChild, result, sx, tx, sy, ty);
+    
+    return;
+}
+
+// range counting
+void CountKDtree(const Node *v, unsigned int &count, const float sx, const float tx, const float sy, const float ty)
+{
+    if (!v) return;
+
     // disjoint case    
     if (v->rightmost < sx || v->leftmost > tx || v->downmost > ty || v->upmost < sy) return;
     
@@ -330,6 +229,8 @@ void CountKDtree(Node *v, unsigned int &count, const float sx, const float tx, c
     }
     
     // intermediate node case
+    if (sx <= v->location.x && sy <= v->location.y && tx >= v->location.x && ty >= v->location.y) ++count;
+
     if (v->leftChild != NULL)
     {        
         if (is_contained(v->leftChild, sx, tx, sy, ty))
@@ -354,82 +255,4 @@ void CountKDtree(Node *v, unsigned int &count, const float sx, const float tx, c
         }
     }
     return;
-}
-
-// sample a point
-int SamplePoint(point* points, Node *v, const float sx, const float tx, const float sy, const float ty)
-{
-    bool flag = 0;
-    
-    if (v->leftChild == NULL && v->rightChild == NULL)  // leaf node case
-    {
-        flag = 1;
-    }
-    else
-    {
-        if (v->leftChild != NULL)
-        {
-            if (is_contained(v->leftChild, sx, tx, sy, ty)) flag = 1;
-        }
-        if (flag == 0 && v->rightChild != NULL)
-        {
-            if (is_contained(v->rightChild, sx, tx, sy, ty)) flag = 1;
-        }
-    }
-
-    if (flag)  // sample from this node (this node is a leaf or has a child covered by the query range)
-    {
-        std::uniform_int_distribution<> rnd_idx(v->left_idx, v->right_idx);
-        int idx = rnd_idx(mt);
-        if (sx <= points[idx].x && sy <= points[idx].y && tx >= points[idx].x && ty >= points[idx].y) return points[idx].idx;
-    }
-    else
-    {
-        bool left_exist = 1;
-        if (v->leftChild != NULL)
-        {
-            if (v->leftChild->rightmost < sx || v->leftChild->leftmost > tx || v->leftChild->downmost > ty || v->leftChild->upmost < sy) left_exist = 0;
-        }
-        else
-        {
-            left_exist = 0;
-        }
-
-        bool right_exist = 1;
-        if (v->rightChild != NULL)
-        {
-            if (v->rightChild->rightmost < sx || v->rightChild->leftmost > tx || v->rightChild->downmost > ty || v->rightChild->upmost < sy) right_exist = 0;
-        }
-        else
-        {
-            right_exist = 0;
-        }
-
-        std::uniform_int_distribution<> rnd_prob(0, v->subtree_size);
-
-        if (left_exist == 1 && right_exist == 1)
-        {
-            unsigned int prob = rnd_prob(mt);
-            if (prob <= v->leftChild->subtree_size)
-            {
-                SamplePoint(points, v->leftChild, sx, tx, sy, ty);
-            }
-            else
-            {
-                SamplePoint(points, v->rightChild, sx, tx, sy, ty);
-            }
-        }
-        else if (left_exist == 1)
-        {
-            unsigned int prob = rnd_prob(mt);
-            if (prob <= v->leftChild->subtree_size) SamplePoint(points, v->leftChild, sx, tx, sy, ty);
-        }
-        else if (right_exist == 1)
-        {
-            unsigned int prob = rnd_prob(mt);
-            if (prob <= v->rightChild->subtree_size) SamplePoint(points, v->rightChild, sx, tx, sy, ty);
-        }
-    }
-    
-    return -1;
 }
