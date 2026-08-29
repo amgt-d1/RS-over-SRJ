@@ -1,5 +1,6 @@
 ## Introduction
 * This repository provides implementations of the algorithms introduced in `Random Sampling over Spatial Range Joins`.
+* A random sampling without replacement version is [here](https://github.com/amgt-d1/Reservoir-Sampling_over_SRJ).
 
 [![MIT licensed](https://img.shields.io/badge/license-MIT-yellow.svg)](https://github.com/amgt-d1/RS-over-SRJ/blob/main/license.txt)
 
